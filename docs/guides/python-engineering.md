@@ -49,23 +49,25 @@ those dependencies at the edge and pass them into library code.
   `from evidence...`, `from insula...`, or `from resources...` as appropriate,
   not relative imports and not `from autonomy...`.
 - Code under `parallax/` imports from `parallax/` as the import root.
+- Code under `harness/` imports from `harness/` as the import root: use
+  `from lint...`, not relative imports and not `from harness...`.
 - Do not edit `sys.path` in active code. Documented live commands and receipts
   may still set `PYTHONPATH=autonomy`.
 - Import what you use. Avoid import-time work beyond constants and cheap type
   definitions.
 
-The import checker in `scripts/check_imports.py` scans tracked Python under
-`autonomy/` and `parallax/`. It rejects relative imports, local imports that
-are not anchored at the concept import root and active `sys.path` edits. It
-skips `autonomy/research/**`, `parallax/research/**`, procedure records, the
-frozen architecture harness and `submodules/`.
+The import checker in `harness/lint/check_imports.py` scans tracked Python
+under `autonomy/`, `parallax/` and `harness/`. It rejects relative imports,
+local imports that are not anchored at the concept import root and active
+`sys.path` edits. It skips `autonomy/research/**`, `parallax/research/**`,
+procedure records, the frozen architecture harness and `submodules/`.
 
 ## Tests
 
 Tests sit beside the source they exercise as `foo_test.py`, with a Bazel
 `py_test` in the same package. Test external behavior and contracts, not helper
-implementation details. Repo-level policy tests may stay at the repository
-root or in `scripts/` when the policy itself is repository-wide.
+implementation details. Repo-level policy tests live in `harness/lint/` when
+the policy itself is repository-wide.
 
 Sureal test tiers are Bazel tags, documented in
 `docs/adr/0004-test-tiers-and-gpu-masking.md`:
@@ -114,7 +116,8 @@ field spelling explicit in tests.
 
 Do not reformat or otherwise edit retained receipts, source snapshots,
 `autonomy/research/**`, `parallax/research/**` or procedure records. The
-repo-gate wrappers take those archive exclusions from `scripts/pinned_sources.py`.
+repo-gate wrappers take those archive exclusions from
+`harness/lint/pinned_sources.py`.
 
 ## Errors
 
@@ -162,7 +165,8 @@ through `./bazelw`; do not install host packages to satisfy a Bazel target.
 The repo gate runs Ruff 0.6.9 from a Bazel-pinned release archive declared in
 `MODULE.bazel`. `pyproject.toml` sets Python 3.10, a 120-column line length and
 the initial lint rule set `E9` and `F821` over active Python in
-`autonomy/**/*.py`, `parallax/**/*.py`, `scripts/**/*.py` and `scripts/*.py`.
+`autonomy/**/*.py`, `parallax/**/*.py`, `harness/**/*.py`,
+`scripts/**/*.py` and `scripts/*.py`.
 The format check currently covers the batch under
 `autonomy/association/` and `autonomy/blob_store/`. Later batches should expand
 the formatted directory list and then widen lint rules based on a fresh live

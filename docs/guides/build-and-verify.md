@@ -223,22 +223,23 @@ fields. If no CUDA device is visible, the requested GPU test should fail with a
 message naming the device visibility problem.
 
 Stale source snapshot or retained evidence conflict: start with
-`//:pinned_sources_test` and `autonomy/evidence/source_snapshot.py`. Do not edit
-retained receipts, source snapshots, root filesystems or locks to make a check
-pass. Historical receipts may point at old bytes; source pins are verified
-against source snapshots, not the current working tree.
+`//:pinned_sources_test`, `//harness/lint:pinned_sources_test` and
+`autonomy/evidence/source_snapshot.py`. Do not edit retained receipts, source
+snapshots, root filesystems or locks to make a check pass. Historical receipts
+may point at old bytes; source pins are verified against source snapshots, not
+the current working tree.
 
 ShellCheck, Ruff, shfmt or clang-format scope surprise: inspect the repo-gate
 target named by the failure in `BUILD.bazel`, then inspect the owning script:
 
-- `scripts/repo_gate_shellcheck_test.py`
-- `scripts/repo_gate_shell_style_test.py`
-- `scripts/repo_gate_shfmt_test.py`
-- `scripts/repo_gate_ruff_test.py`
-- `scripts/repo_gate_clang_format_test.py`
-- `scripts/check_shell_style.py`
-- `scripts/ruff_repo.py`
-- `scripts/clang_format_repo.py`
+- `harness/lint/repo_gate_shellcheck_test.py`
+- `harness/lint/repo_gate_shell_style_test.py`
+- `harness/lint/repo_gate_shfmt_test.py`
+- `harness/lint/repo_gate_ruff_test.py`
+- `harness/lint/repo_gate_clang_format_test.py`
+- `harness/lint/check_shell_style.py`
+- `harness/lint/ruff_repo.py`
+- `harness/lint/clang_format_repo.py`
 
 The scope is derived from tracked repository files with exclusions for
 historical archives and submodules. Fix the active file or update the owning

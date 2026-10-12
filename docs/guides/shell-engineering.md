@@ -16,7 +16,7 @@ decisions and structured state belong in Python modules where they can be
 unit-tested through Bazel. This follows [ADR 0003](../adr/0003-python-over-shell-for-policy.md).
 
 New shell scripts stay below 150 lines. Existing longer scripts are recorded in
-`scripts/shell_style_baseline.json`; that baseline may only shrink. When a
+`harness/lint/shell_style_baseline.json`; that baseline may only shrink. When a
 grandfathered script changes substantially, move decision-making and data
 handling into Python before allowing the shell wrapper to grow.
 
@@ -143,17 +143,17 @@ Do not add file-wide or wholesale disables.
 
 ## Mechanical Shell Lint
 
-The repo gate runs `scripts/check_shell_style.py` over active shell files under
-`autonomy/`, `parallax/` and `scripts/`, excluding historical archives and
-submodules. It enforces the `#!/usr/bin/env bash` shebang, a header comment,
-function comments, the 120-column limit, no backticks and the 150-line limit
-outside the checked-in baseline.
+The repo gate runs `harness/lint/check_shell_style.py` over active shell files
+under `autonomy/`, `parallax/`, `harness/` and `scripts/`, excluding
+historical archives and submodules. It enforces the `#!/usr/bin/env bash`
+shebang, a header comment, function comments, the 120-column limit, no
+backticks and the 150-line limit outside the checked-in baseline.
 
 ## Sureal Deltas From Milano
 
 - Active scripts use `#!/usr/bin/env bash`, not `#!/bin/bash`.
 - The shell length limit is 150 lines, with a shrinking
-  `scripts/shell_style_baseline.json`.
+  `harness/lint/shell_style_baseline.json`.
 - ShellCheck and shfmt are Bazel-pinned and run through `./bazelw`, never host
   package installs.
 - Active shell scripts are editable and linted even when historical receipts or
@@ -175,4 +175,5 @@ outside the checked-in baseline.
 - Diagnostics go to stderr with `printf ... >&2`.
 - Lines stay within 120 columns, and active scripts stay within 150 lines unless
   grandfathered in the shrinking baseline.
-- ShellCheck, shfmt and `scripts/check_shell_style.py` pass in `//:repo_gate`.
+- ShellCheck, shfmt and `harness/lint/check_shell_style.py` pass in
+  `//:repo_gate`.

@@ -2,8 +2,12 @@
 
 ## Sureal Final Concept Map
 
-Sureal follows the semantic layout directly under `autonomy/`. Active code is
-owned by concept, not by language, runtime, file kind, or temporary study stage:
+Sureal's top-level directories name concepts. `autonomy/` owns perception
+research, `parallax/` owns the 3D pathway, `harness/` owns repository tooling,
+and `scripts/` remains Surflo-compatible user entry points.
+
+Active code under `autonomy/` is owned by concept, not by language, runtime,
+file kind, or temporary study stage:
 
 ```text
 autonomy/

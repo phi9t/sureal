@@ -17,5 +17,8 @@ Inside `autonomy/`, code is reorganised into concept directories (starting from 
 ## Consequences
 
 - `surflo/` is the upstream fork's package and does not move or change. `submodules/`, `training/`, `configs/`, `install/`, `scripts/`, `tests/` and the three smaller experiments also stay where they are for now.
+- 2026-10-10 follow-up: repository tooling now lives under `harness/` as its
+  own concept and import root. `scripts/` remains for Surflo-compatible user
+  entry points until a ticket explicitly moves more of that boundary.
 - The frozen four-recipe balanced16 sweep must be re-admitted on the new paths and sources before it can resume.
 - Receipts written before the move keep their old paths. They remain historical records; see the autonomy ADR on source pins for what they are checked against.

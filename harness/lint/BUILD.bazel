@@ -1,0 +1,554 @@
+load("@rules_python//python:defs.bzl", "py_binary", "py_library", "py_test")
+
+package(default_visibility = ["//visibility:private"])
+
+PY_IMPORTS = [".."]
+
+py_library(
+    name = "check_identifiers_lib",
+    srcs = ["check_identifiers.py"],
+    imports = PY_IMPORTS,
+)
+
+py_library(
+    name = "check_imports_lib",
+    srcs = ["check_imports.py"],
+    imports = PY_IMPORTS,
+    deps = [":pinned_sources_lib"],
+)
+
+py_binary(
+    name = "check_imports",
+    srcs = ["check_imports.py"],
+    data = [
+        "import_rule_baseline.json",
+    ],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    main = "check_imports.py",
+    deps = [":pinned_sources_lib"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "check_storage_boundary_lib",
+    srcs = ["check_storage_boundary.py"],
+    imports = PY_IMPORTS,
+)
+
+py_library(
+    name = "clang_format_repo_lib",
+    srcs = ["clang_format_repo.py"],
+    imports = PY_IMPORTS,
+    deps = [":pinned_sources_lib"],
+)
+
+py_library(
+    name = "check_cxx_lib",
+    srcs = ["check_cxx.py"],
+    imports = PY_IMPORTS,
+    deps = [":pinned_sources_lib"],
+)
+
+py_binary(
+    name = "check_cxx",
+    srcs = ["check_cxx.py"],
+    data = [
+        "cxx_lint_baseline.json",
+    ],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    main = "check_cxx.py",
+    deps = [":pinned_sources_lib"],
+    visibility = ["//visibility:public"],
+)
+
+py_binary(
+    name = "clang_format_repo",
+    srcs = ["clang_format_repo.py"],
+    args = ["--clang-format=$(location @clang_format_linux_x86_64//:clang-format)"],
+    data = [
+        "//:.clang-format",
+        "@clang_format_linux_x86_64//:clang-format",
+    ],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    main = "clang_format_repo.py",
+    deps = [":pinned_sources_lib"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "publication_audit_lib",
+    srcs = ["publication_audit.py"],
+    imports = PY_IMPORTS,
+)
+
+py_library(
+    name = "pinned_sources_lib",
+    srcs = ["pinned_sources.py"],
+    imports = PY_IMPORTS,
+)
+
+py_binary(
+    name = "pinned_sources",
+    srcs = ["pinned_sources.py"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    main = "pinned_sources.py",
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "shellcheck_repo_lib",
+    srcs = ["shellcheck_repo.py"],
+    imports = PY_IMPORTS,
+    deps = [":pinned_sources_lib"],
+)
+
+py_binary(
+    name = "shellcheck_repo",
+    srcs = ["shellcheck_repo.py"],
+    args = ["--shellcheck=$(location @shellcheck_linux_x86_64//:shellcheck)"],
+    data = [
+        "@shellcheck_linux_x86_64//:shellcheck",
+    ],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    main = "shellcheck_repo.py",
+    deps = [":pinned_sources_lib"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "check_shell_style_lib",
+    srcs = ["check_shell_style.py"],
+    imports = PY_IMPORTS,
+    deps = [":pinned_sources_lib"],
+)
+
+py_binary(
+    name = "check_shell_style",
+    srcs = ["check_shell_style.py"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    main = "check_shell_style.py",
+    deps = [":pinned_sources_lib"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "shfmt_repo_lib",
+    srcs = ["shfmt_repo.py"],
+    imports = PY_IMPORTS,
+    deps = [":pinned_sources_lib"],
+)
+
+py_binary(
+    name = "shfmt_repo",
+    srcs = ["shfmt_repo.py"],
+    args = ["--shfmt=$(location @shfmt_linux_x86_64//file)"],
+    data = [
+        "@shfmt_linux_x86_64//file",
+    ],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    main = "shfmt_repo.py",
+    deps = [":pinned_sources_lib"],
+    visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "ruff_repo_lib",
+    srcs = ["ruff_repo.py"],
+    imports = PY_IMPORTS,
+    deps = [":pinned_sources_lib"],
+)
+
+py_binary(
+    name = "ruff_repo",
+    srcs = ["ruff_repo.py"],
+    args = ["--ruff=$(location @ruff_linux_x86_64//:ruff)"],
+    data = [
+        "@ruff_linux_x86_64//:ruff",
+        "//:pyproject.toml",
+    ],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    main = "ruff_repo.py",
+    deps = [":pinned_sources_lib"],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "publication_audit_behavior_test",
+    srcs = ["publication_audit_behavior_test.py"],
+    deps = [":publication_audit_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "check_identifiers_test",
+    srcs = ["check_identifiers_test.py"],
+    data = [
+        "check_identifiers_baseline.json",
+    ],
+    deps = [":check_identifiers_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "check_cxx_test",
+    srcs = ["check_cxx_test.py"],
+    data = [
+        "cxx_lint_baseline.json",
+    ],
+    deps = [":check_cxx_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "import_rule_behavior_test",
+    srcs = ["import_rule_behavior_test.py"],
+    deps = [":check_imports_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "check_storage_boundary_test",
+    srcs = ["check_storage_boundary_test.py"],
+    deps = [":check_storage_boundary_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "githooks_test",
+    srcs = ["githooks_test.py"],
+    data = [
+        "//:.githooks/pre-commit",
+    ],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "pinned_sources_test",
+    srcs = ["pinned_sources_test.py"],
+    deps = [":pinned_sources_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "repo_gate_import_rule_test",
+    srcs = ["repo_gate_import_rule_test.py"],
+    data = [
+        "import_rule_baseline.json",
+    ],
+    deps = [":check_imports_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "repo_gate_clang_format_test",
+    srcs = ["repo_gate_clang_format_test.py"],
+    args = ["--clang-format=$(location @clang_format_linux_x86_64//:clang-format)"],
+    data = [
+        "//:.clang-format",
+        "@clang_format_linux_x86_64//:clang-format",
+    ],
+    deps = [
+        ":clang_format_repo_lib",
+        ":pinned_sources_lib",
+    ],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "repo_gate_cxx_test",
+    srcs = ["repo_gate_cxx_test.py"],
+    data = [
+        "cxx_lint_baseline.json",
+    ],
+    deps = [
+        ":check_cxx_lib",
+        ":pinned_sources_lib",
+    ],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "repo_gate_membership_test",
+    srcs = ["repo_gate_membership_test.py"],
+    data = [
+        "//:BUILD.bazel",
+    ],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "repo_gate_publication_audit_test",
+    srcs = ["repo_gate_publication_audit_test.py"],
+    data = [
+        "publication_audit.py",
+    ],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "repo_gate_whitespace_test",
+    srcs = ["repo_gate_whitespace_test.py"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "repo_gate_shellcheck_test",
+    srcs = ["repo_gate_shellcheck_test.py"],
+    args = ["--shellcheck=$(location @shellcheck_linux_x86_64//:shellcheck)"],
+    data = [
+        "@shellcheck_linux_x86_64//:shellcheck",
+    ],
+    deps = [":shellcheck_repo_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "repo_gate_shell_style_test",
+    srcs = ["repo_gate_shell_style_test.py"],
+    data = [
+        "shell_style_baseline.json",
+    ],
+    deps = [":check_shell_style_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "repo_gate_shfmt_test",
+    srcs = ["repo_gate_shfmt_test.py"],
+    args = ["--shfmt=$(location @shfmt_linux_x86_64//file)"],
+    data = [
+        "@shfmt_linux_x86_64//file",
+    ],
+    deps = [":shfmt_repo_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "repo_gate_ruff_test",
+    srcs = ["repo_gate_ruff_test.py"],
+    args = ["--ruff=$(location @ruff_linux_x86_64//:ruff)"],
+    data = [
+        "@ruff_linux_x86_64//:ruff",
+        "//:pyproject.toml",
+    ],
+    deps = [":ruff_repo_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "medium",
+    tags = [
+        "no-sandbox",
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "ruff_repo_test",
+    srcs = ["ruff_repo_test.py"],
+    args = ["--ruff=$(location @ruff_linux_x86_64//:ruff)"],
+    data = [
+        "@ruff_linux_x86_64//:ruff",
+    ],
+    deps = [":ruff_repo_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "check_shell_style_test",
+    srcs = ["check_shell_style_test.py"],
+    data = [
+        "shell_style_baseline.json",
+    ],
+    deps = [":check_shell_style_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "shellcheck_repo_test",
+    srcs = ["shellcheck_repo_test.py"],
+    args = ["--shellcheck=$(location @shellcheck_linux_x86_64//:shellcheck)"],
+    data = [
+        "@shellcheck_linux_x86_64//:shellcheck",
+    ],
+    deps = [":shellcheck_repo_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "shfmt_repo_test",
+    srcs = ["shfmt_repo_test.py"],
+    args = ["--shfmt=$(location @shfmt_linux_x86_64//file)"],
+    data = [
+        "@shfmt_linux_x86_64//file",
+    ],
+    deps = [":shfmt_repo_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "clang_format_repo_test",
+    srcs = ["clang_format_repo_test.py"],
+    args = ["--clang-format=$(location @clang_format_linux_x86_64//:clang-format)"],
+    data = [
+        "@clang_format_linux_x86_64//:clang-format",
+    ],
+    deps = [":clang_format_repo_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "small",
+    tags = [
+        "repo_gate",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+py_test(
+    name = "publication_audit_test",
+    srcs = ["publication_audit_test.py"],
+    deps = [":publication_audit_lib"],
+    imports = PY_IMPORTS,
+    legacy_create_init = 0,
+    size = "medium",
+)

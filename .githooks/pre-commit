@@ -4,7 +4,8 @@ set -euo pipefail
 
 root="$(git rev-parse --show-toplevel)"
 cd "$root"
+export PYTHONPATH="$root/harness${PYTHONPATH:+:$PYTHONPATH}"
 
 git diff --cached --check
-python3 scripts/check_identifiers.py --root "$root"
-python3 scripts/check_storage_boundary.py --root "$root/autonomy"
+python3 harness/lint/check_identifiers.py --root "$root"
+python3 harness/lint/check_storage_boundary.py --root "$root/autonomy"

@@ -104,9 +104,9 @@ Follow the accepted ADRs before changing boundaries:
   executions are described by launch plans checked against full runtime locks.
 
 Keep hooks and shell wrappers thin. Static hooks may run
-`git diff --cached --check`, `scripts/check_identifiers.py`, and the standalone
-storage-boundary scan, but they must not import repo runtime code or replace the
-Insula gates.
+`git diff --cached --check`, `harness/lint/check_identifiers.py`, and the
+standalone storage-boundary scan in `harness/lint/check_storage_boundary.py`,
+but they must not import repo runtime code or replace the Insula gates.
 
 ## Issue tracker
 

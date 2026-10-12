@@ -39,10 +39,10 @@ jobs:
           tomli==2.4.1
 
       - name: Test publication contract
-        run: python -m unittest tests.test_publication_audit -v
+        run: PYTHONPATH=harness python -m unittest lint.publication_audit_test -v
 
       - name: Audit repository
-        run: python scripts/publication_audit.py --root .
+        run: PYTHONPATH=harness python -m lint.publication_audit --root .
 
       - name: Build distributions
         run: python -m build

@@ -28,8 +28,8 @@ Run the narrowest relevant tests while developing, then the applicable gate:
 
 ```bash
 # Portable CPU publication gate (required for every pull request)
-python -m unittest tests.test_publication_audit -v
-python scripts/publication_audit.py --root .
+PYTHONPATH=harness python -m unittest lint.publication_audit_test -v
+PYTHONPATH=harness python -m lint.publication_audit --root .
 
 # Inspect the Insula sandbox command selected by the Bazel wrapper
 ./bazelw --emit-plan test //parallax/...

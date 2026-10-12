@@ -32,7 +32,7 @@ Python.
 
 - New shell scripts are thin wrappers and stay below 150 lines.
 - Existing scripts over 150 lines are grandfathered in
-  `scripts/shell_style_baseline.json`, which may only shrink.
+  `harness/lint/shell_style_baseline.json`, which may only shrink.
 - When a grandfathered script is changed substantially, its decision-making and
   data handling move into Python before the shell wrapper grows.
 - Shell style and formatting are enforced in `//:repo_gate` for active,

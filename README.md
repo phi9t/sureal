@@ -37,7 +37,8 @@ the original Surflo project. The public repository is
 Validation has four intentionally separate tiers:
 
 - **Portable:** CPU-only publication, metadata, syntax, and offline source
-  checks run by GitHub Actions and `python scripts/publication_audit.py --root .`.
+  checks run by GitHub Actions and
+  `PYTHONPATH=harness python -m lint.publication_audit --root .`.
 - **Bazel component tests:** `./bazelw test //parallax/...` and
   `./bazelw test //autonomy/...` run inside their recorded Insula rootfs
   images. The default runs exclude GPU and live-gate targets.

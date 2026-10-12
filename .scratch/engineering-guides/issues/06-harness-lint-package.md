@@ -6,7 +6,7 @@
 
 **Blocked by:** 01, 02, 03, 04, 07 (they add, name or unfreeze files under `scripts/`; moving after they land avoids conflicts)
 
-**Status:** ready-for-agent
+**Status:** done
 
 Source: `~/workspace/milano/harness/` and its subpackage READMEs (`harness/workflow/lint/README.md`). See also
 Milano commit `bbe03b7` ("Each harness subpackage has a README saying what it owns"). Sureal ADR 0001 says
@@ -29,16 +29,24 @@ Decisions (coordinator, 2026-10-11):
   collaboration tooling and the Insula core move in tickets 08 and 09.
 - Retained receipts and evidence JSON are not edited. Ticket 07 has already retired the source freeze.
 
-- [ ] `git mv` the files above. History follows the renames: one commit of pure moves, then one commit of
+- [x] `git mv` the files above. History follows the renames: one commit of pure moves, then one commit of
   reference fixes. If the import-root change cannot stay green on its own, squash the two at landing.
-- [ ] Bazel targets move to `harness/lint/BUILD.bazel` (or `harness/BUILD.bazel`). `//:repo_gate` keeps the same
+- [x] Bazel targets move to `harness/lint/BUILD.bazel` (or `harness/BUILD.bazel`). `//:repo_gate` keeps the same
   test set, and the membership test proves it. Target labels change only where the move forces it.
-- [ ] `.githooks/pre-commit` and `AGENTS.md` (Commands, "Keep hooks and shell wrappers thin") name the new
+- [x] `.githooks/pre-commit` and `AGENTS.md` (Commands, "Keep hooks and shell wrappers thin") name the new
   paths. The hook still imports no repo runtime code.
-- [ ] Every active reference is updated: guides, ADRs (append a consequence note, never rewrite history),
+- [x] Every active reference is updated: guides, ADRs (append a consequence note, never rewrite history),
   `CONTRIBUTING.md` and `docs/repo-structure.md`. `.scratch/` history and retained evidence are left alone.
-- [ ] `harness/README.md` (what harness owns and the subpackage map) and
+- [x] `harness/README.md` (what harness owns and the subpackage map) and
   `harness/lint/README.md` (owns, boundaries, entry points), in Milano's subpackage README shape.
-- [ ] A new ADR, `docs/adr/0005-harness-holds-repo-tooling.md`, records the decision and the import root.
-- [ ] Live first: `./bazelw test //:repo_gate` is green after the move and shows the same test count plus any
+- [x] A new ADR, `docs/adr/0005-harness-holds-repo-tooling.md`, records the decision and the import root.
+- [x] Live first: `./bazelw test //:repo_gate` is green after the move and shows the same test count plus any
   moved tests. Then `//autonomy/...` and `//parallax/...` pass.
+
+## Comments
+
+- 2026-10-12 Landed by the coordinator. The 26 repo-gate checkers, their baselines and tests moved from
+  `scripts/` and `tests/` to `harness/lint/` as pure renames plus reference fixes. `harness/` is an import root
+  (`from lint...`). `//:repo_gate` keeps the same membership via `//harness/lint:*`. ADR 0005, `harness/README.md`
+  and `harness/lint/README.md` were added. The hook, CI workflow, guides and AGENTS.md now name the new paths. The
+  coordinator set this Status line, which the worker left unset.

@@ -220,9 +220,9 @@ the Bazel target is the verification boundary.
 
 ## Mechanical Lint
 
-`scripts/check_cxx.py` scans tracked active C++ under `autonomy/` and
+`harness/lint/check_cxx.py` scans tracked active C++ under `autonomy/` and
 `parallax/`. It is aware of comments and string literals, excludes historical
-archives and submodules through `scripts/pinned_sources.py`, and rejects:
+archives and submodules through `harness/lint/pinned_sources.py`, and rejects:
 
 - forbidden suffixes: `.cpp`, `.h`, `.hpp`, `.hxx`;
 - headers without `#pragma once`;
@@ -238,7 +238,8 @@ archives and submodules through `scripts/pinned_sources.py`, and rejects:
 ## Known Deviations
 
 Existing C++ issues that entered lint scope when the lint-side source freeze was
-retired are recorded in the shrink-only `scripts/cxx_lint_baseline.json`:
+retired are recorded in the shrink-only
+`harness/lint/cxx_lint_baseline.json`:
 
 - `autonomy/camera/project_camera.cc`
 - `autonomy/motion/cli/motion_metrics_main.cc`
